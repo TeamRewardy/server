@@ -43,6 +43,28 @@ type PaginatedUser {
   pageInfo: PageInfo!
 }
 
+"""Reward."""
+type Reward implements Node {
+  """The ID of the node."""
+  id: ID!
+
+  """The creation date of the node."""
+  createdAt: DateTime!
+
+  """The last modified date of the node."""
+  lastModifiedAt: DateTime!
+  giverId: ID!
+  receiverId: ID!
+  date: DateTime!
+  reason: String
+  anonymous: Boolean!
+}
+
+type PaginatedReward {
+  nodes: [Reward!]!
+  pageInfo: PageInfo!
+}
+
 type Query {
   me: User!
   user(id: String!): User!
@@ -62,11 +84,30 @@ type Query {
     """Limit the number of results returned."""
     limit: Int = 25
   ): PaginatedUser!
+  reward(id: ID!): Reward!
+  rewards(
+    """A search query string."""
+    search: String
+
+    """Sort the results by the specified field."""
+    sortBy: String
+
+    """Sort the results in true = descending, or false = ascending order."""
+    sortDesc: Boolean = false
+
+    """Offset the results returned."""
+    offset: Int = 0
+
+    """Limit the number of results returned."""
+    limit: Int = 25
+  ): PaginatedReward!
 }
 
 type Mutation {
   addUser(newUserData: NewUserInput!): User!
   updateUser(id: String!, updateUserData: UpdateUserInput!): User!
+  addReward(newRewardData: NewRewardInput!): Reward!
+  removeReward(id: ID!): Boolean!
 }
 
 input NewUserInput {
@@ -78,7 +119,17 @@ input UpdateUserInput {
   token: String!
 }
 
+input NewRewardInput {
+  giverId: ID!
+  receiverId: ID!
+  date: DateTime
+  reason: String
+  anonymous: Boolean = false
+}
+
 type Subscription {
   userAdded: User!
   userUpdated: User!
+  rewardAdded: Reward!
+  rewardRemoved: ID!
 }

@@ -54,10 +54,6 @@ describe('UsersResolver', () => {
         username: 'User 01',
       }),
     );
-    expect(
-      // @ts-expect-error: There should be no password
-      actual.password,
-    ).toBeUndefined();
 
     expect(mockUsersService.create).toHaveBeenCalled();
   });
