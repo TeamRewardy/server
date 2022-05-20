@@ -31,6 +31,7 @@ describe('RewardsResolver (e2e)', () => {
 
   it('reward', async () => {
     const reward = faker.helpers.arrayElement(REWARDS);
+    reward.reason = faker.lorem.sentence();
 
     const test = request(app.getHttpServer())
       .post('/graphql')
@@ -63,6 +64,7 @@ describe('RewardsResolver (e2e)', () => {
           createdAt: reward.createdAt.toISOString(),
           lastModifiedAt: reward.lastModifiedAt.toISOString(),
           date: reward.date.toISOString(),
+          reason: reward.reason,
         };
 
         expect(data.reward).toEqual(expected);

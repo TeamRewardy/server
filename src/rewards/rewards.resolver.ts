@@ -5,7 +5,9 @@ import {
   ID,
   Info,
   Mutation,
+  Parent,
   Query,
+  ResolveField,
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
@@ -16,6 +18,8 @@ import { SearchArgs } from 'src/common/dto/search.args';
 import { SortArgs } from 'src/common/dto/sort.args';
 import { paginated } from 'src/common/utils/pagination.util';
 import { PUB_SUB_KEY } from 'src/pub-sub.module';
+import { User } from 'src/users/models/user.model';
+import { UsersDataLoader, USERS_LOADER_KEY } from 'src/users/users.loader';
 import { NewRewardInput } from './dto/new-reward.input';
 import { RewardsFilterArgs } from './dto/rewards-filter.args';
 import { PaginatedReward, Reward, RewardId } from './models/reward.model';
@@ -101,5 +105,31 @@ export class RewardsResolver {
   @Subscription((returns) => ID)
   rewardRemoved(): AsyncIterator<unknown, any, undefined> {
     return this.pubSub.asyncIterator(REWARD_REMOVED);
+  }
+
+  @ResolveField((returns) => User)
+  async giver(
+    @Parent() reward: Reward,
+    @Context(USERS_LOADER_KEY) usersLoader: UsersDataLoader,
+  ): Promise<User> {
+    const giver = await usersLoader.load(reward.giverId);
+    if (!giver) {
+      this.logger.warn(`${User.name} ${reward.giverId} not found`);
+      throw new NotFoundException(`${User.name} ${reward.giverId}`);
+    }
+    return giver;
+  }
+
+  @ResolveField((returns) => User)
+  async receiver(
+    @Parent() reward: Reward,
+    @Context(USERS_LOADER_KEY) usersLoader: UsersDataLoader,
+  ): Promise<User> {
+    const receiver = await usersLoader.load(reward.receiverId);
+    if (!receiver) {
+      this.logger.warn(`${User.name} ${reward.receiverId} not found`);
+      throw new NotFoundException(`${User.name} ${reward.receiverId}`);
+    }
+    return receiver;
   }
 }

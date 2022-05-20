@@ -58,6 +58,8 @@ type Reward implements Node {
   date: DateTime!
   reason: String
   anonymous: Boolean!
+  giver: User!
+  receiver: User!
 }
 
 type PaginatedReward {
