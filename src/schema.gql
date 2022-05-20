@@ -1,0 +1,84 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""PageInfo """
+type PageInfo {
+  totalCount: Int!
+  hasNextPage: Boolean!
+}
+
+"""User."""
+type User implements Node {
+  """The ID of the node."""
+  id: ID!
+
+  """The creation date of the node."""
+  createdAt: DateTime!
+
+  """The last modified date of the node."""
+  lastModifiedAt: DateTime!
+  username: String!
+}
+
+"""Node."""
+interface Node {
+  """The ID of the node."""
+  id: ID!
+
+  """The creation date of the node."""
+  createdAt: DateTime!
+
+  """The last modified date of the node."""
+  lastModifiedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PaginatedUser {
+  nodes: [User!]!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  me: User!
+  user(id: String!): User!
+  users(
+    """A search query string."""
+    search: String
+
+    """Sort the results by the specified field."""
+    sortBy: String
+
+    """Sort the results in true = descending, or false = ascending order."""
+    sortDesc: Boolean = false
+
+    """Offset the results returned."""
+    offset: Int = 0
+
+    """Limit the number of results returned."""
+    limit: Int = 25
+  ): PaginatedUser!
+}
+
+type Mutation {
+  addUser(newUserData: NewUserInput!): User!
+  updateUser(id: String!, updateUserData: UpdateUserInput!): User!
+}
+
+input NewUserInput {
+  username: String!
+  token: String!
+}
+
+input UpdateUserInput {
+  token: String!
+}
+
+type Subscription {
+  userAdded: User!
+  userUpdated: User!
+}

@@ -1,1 +1,1 @@
-# server
+# TeamRewardy Server
