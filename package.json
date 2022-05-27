@@ -23,7 +23,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@faker-js/faker": "~6.3.1",
+    "@faker-js/faker": "~7.1.0",
     "@nestjs/apollo": "~10.0.12",
     "@nestjs/axios": "~0.0.8",
     "@nestjs/common": "~8.4.5",
@@ -32,14 +32,13 @@
     "@nestjs/graphql": "~10.0.12",
     "@nestjs/passport": "~8.2.1",
     "@nestjs/platform-express": "~8.4.5",
-    "apollo-server-express": "~3.7.0",
+    "apollo-server-express": "~3.8.1",
     "axios": "0.27.2",
     "class-transformer": "~0.5.1",
     "class-validator": "~0.13.2",
     "dataloader": "~2.1.0",
     "graphql": "~16.5.0",
     "graphql-subscriptions": "~2.0.0",
-    "graphql-upload": "~13.0.0",
     "passport": "~0.5.3",
     "passport-github2": "~0.1.12",
     "passport-http-bearer": "~1.0.1",
@@ -47,7 +46,7 @@
     "rxjs": "~7.5.5"
   },
   "devDependencies": {
-    "@apollo/gateway": "~2.0.2",
+    "@apollo/gateway": "~2.0.3",
     "@jest/types": "~28.1.0",
     "@nestjs/cli": "~8.2.6",
     "@nestjs/schematics": "~8.0.11",
@@ -61,9 +60,9 @@
     "@types/supertest": "~2.0.12",
     "@types/validator": "~13.7.2",
     "@types/ws": "~8.5.3",
-    "@typescript-eslint/eslint-plugin": "~5.25.0",
-    "@typescript-eslint/parser": "~5.25.0",
-    "eslint": "~8.15.0",
+    "@typescript-eslint/eslint-plugin": "~5.26.0",
+    "@typescript-eslint/parser": "~5.26.0",
+    "eslint": "~8.16.0",
     "eslint-config-prettier": "~8.5.0",
     "eslint-define-config": "~1.4.1",
     "eslint-gitignore": "~0.1.0",
@@ -77,13 +76,13 @@
     "source-map-support": "~0.5.21",
     "supertest": "~6.2.3",
     "superwstest": "~2.0.2",
-    "ts-jest": "~28.0.2",
+    "ts-jest": "~28.0.3",
     "ts-loader": "~9.3.0",
     "ts-morph": "~14.0.0",
-    "ts-node": "~10.7.0",
+    "ts-node": "~10.8.0",
     "tsconfig-paths": "~4.0.0",
-    "type-fest": "~2.12.2",
-    "typescript": "~4.6.4"
+    "type-fest": "~2.13.0",
+    "typescript": "~4.7.2"
   },
   "pnpm": {
     "peerDependencyRules": {
