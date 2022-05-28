@@ -1,18 +1,24 @@
 import { faker } from '@faker-js/faker';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import NeDB from '@seald-io/nedb';
 import { UUID_V4_REGEX } from 'src/common/utils/uuid.util';
-import { REWARDS } from 'src/mocks/rewards';
-import { USERS } from 'src/mocks/users';
+import { createRandomReward } from 'src/mocks/rewards';
+import { createRandomUser } from 'src/mocks/users';
+import type { User } from 'src/users/models/user.model';
 import { Reward } from './models/reward.model';
 import { RewardsService } from './rewards.service';
 
 describe('RewardsService', () => {
   let service: RewardsService;
 
+  let mockDb: NeDB<Reward>;
+
   beforeEach(async () => {
+    mockDb = new NeDB<Reward>();
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [RewardsService],
+      providers: [RewardsService, { provide: 'REWARDS_DB', useValue: mockDb }],
     }).compile();
 
     service = module.get<RewardsService>(RewardsService);
@@ -23,9 +29,11 @@ describe('RewardsService', () => {
   });
 
   it('should create a new reward', async () => {
+    const users: User[] = Array.from({ length: 5 }, () => createRandomUser());
+
     const actual = await service.create({
-      giverId: faker.helpers.arrayElement(USERS).id,
-      receiverId: faker.helpers.arrayElement(USERS).id,
+      giverId: faker.helpers.arrayElement(users).id,
+      receiverId: faker.helpers.arrayElement(users).id,
     });
 
     expect(actual).toBeTruthy();
@@ -42,11 +50,10 @@ describe('RewardsService', () => {
   });
 
   it('should find rewards', async () => {
-    const totalCount = REWARDS.length;
-
-    // const mockedRewards = Array.from({ length: totalCount }, () =>
-    //   createRandomReward(),
-    // );
+    const totalCount = 5;
+    await mockDb.insertAsync(
+      Array.from({ length: totalCount }, () => createRandomReward()),
+    );
 
     const rewards = await service.findAll({ offset: 0, limit: 10 });
     expect(rewards).toHaveLength(totalCount);
@@ -60,7 +67,12 @@ describe('RewardsService', () => {
   });
 
   it('should count rewards', async () => {
+    const totalCount = 5;
+    await mockDb.insertAsync(
+      Array.from({ length: totalCount }, () => createRandomReward()),
+    );
+
     const count = await service.count({});
-    expect(count).toEqual(REWARDS.length);
+    expect(count).toEqual(totalCount);
   });
 });

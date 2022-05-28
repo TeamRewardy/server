@@ -16,7 +16,7 @@ export function castUserId(id: string): UserId {
 
 export interface UserConstructorParams extends NodeConstructorParams<UserId> {
   username: string;
-  token?: string;
+  token?: string | null;
 }
 
 @ObjectType({
@@ -29,8 +29,14 @@ export class User extends Node<UserId> {
 
   token?: string | null;
 
-  constructor({ id, username, token }: UserConstructorParams) {
-    super({ id });
+  constructor({
+    id,
+    createdAt,
+    lastModifiedAt,
+    username,
+    token,
+  }: UserConstructorParams) {
+    super({ id, createdAt, lastModifiedAt });
     this.username = username;
     this.token = token;
   }

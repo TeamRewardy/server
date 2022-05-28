@@ -37,3 +37,5 @@ junit.xml
 !.vscode/extensions.json
 
 *.tsbuildinfo
+
+/db

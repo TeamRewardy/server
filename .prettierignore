@@ -1,6 +1,7 @@
 .pnpm-store/
 coverage-e2e/
 coverage/
+db/
 dist/
 src/schema.gql
 pnpm-lock.yaml

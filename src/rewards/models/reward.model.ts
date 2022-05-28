@@ -48,13 +48,15 @@ export class Reward extends Node<RewardId> {
 
   constructor({
     id,
+    createdAt,
+    lastModifiedAt,
     giverId,
     receiverId,
     date,
     reason,
     anonymous,
   }: RewardConstructorParams) {
-    super({ id });
+    super({ id, createdAt, lastModifiedAt });
     this.giverId = giverId;
     this.receiverId = receiverId;
     if (typeof date === 'string') {

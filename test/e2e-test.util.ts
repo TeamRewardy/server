@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { createRandomUser, USERS } from 'src/mocks/users';
+import { createRandomUser } from 'src/mocks/users';
 import type { User } from 'src/users/models/user.model';
 
 type JsonObject = { [member: string]: JsonValue };
@@ -36,16 +36,14 @@ export function subscribeRequest({
   };
 }
 
-export function createTestuser(): User {
+export function createTestUser(): User {
   const test = createRandomUser();
   test.username = 'Test';
   test.token = 'test-token';
   return test;
 }
 
-export const TEST_USER = createTestuser();
-
-USERS.push(TEST_USER);
+export const TEST_USER = createTestUser();
 
 export const AUTH_HEADER = {
   Authorization: `Bearer ${Buffer.from(

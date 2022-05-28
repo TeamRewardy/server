@@ -7,6 +7,7 @@ export interface NodeId extends String {
 export interface NodeConstructorParams<Id extends NodeId> {
   id: Id;
   createdAt?: Date;
+  lastModifiedAt?: Date;
 }
 
 @InterfaceType({
@@ -25,13 +26,13 @@ export abstract class Node<Id extends NodeId> {
   @Field({ description: 'The last modified date of the node.' })
   lastModifiedAt: Date;
 
-  constructor({ id, createdAt }: NodeConstructorParams<Id>) {
+  constructor({ id, createdAt, lastModifiedAt }: NodeConstructorParams<Id>) {
     this.id = id;
 
     if (typeof createdAt === 'string') {
       createdAt = new Date(createdAt);
     }
     this.createdAt = createdAt ?? new Date();
-    this.lastModifiedAt = this.createdAt;
+    this.lastModifiedAt = lastModifiedAt ?? this.createdAt;
   }
 }

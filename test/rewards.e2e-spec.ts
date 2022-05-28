@@ -3,20 +3,35 @@ import type { INestApplication } from '@nestjs/common';
 import { ValidationPipe } from '@nestjs/common';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import NeDB from '@seald-io/nedb';
 import { AppModule } from 'src/app.module';
 import { UUID_V4_REGEX } from 'src/common/utils/uuid.util';
-import { createRandomReward, REWARDS } from 'src/mocks/rewards';
-import { USERS } from 'src/mocks/users';
+import { createRandomReward } from 'src/mocks/rewards';
+import type { Reward } from 'src/rewards/models/reward.model';
+import type { User } from 'src/users/models/user.model';
 import request from 'superwstest';
-import { AUTH_HEADER, subscribeRequest } from './e2e-test.util';
+import { AUTH_HEADER, subscribeRequest, TEST_USER } from './e2e-test.util';
 
 describe('RewardsResolver (e2e)', () => {
   let app: INestApplication;
 
+  let mockRewardsDb: NeDB<Reward>;
+  let mockUsersDb: NeDB<User>;
+
   beforeEach(async () => {
+    mockRewardsDb = new NeDB<Reward>();
+    mockUsersDb = new NeDB<User>();
+
+    await mockUsersDb.insertAsync(TEST_USER);
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider('REWARDS_DB')
+      .useValue(mockRewardsDb)
+      .overrideProvider('USERS_DB')
+      .useValue(mockUsersDb)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
@@ -30,8 +45,10 @@ describe('RewardsResolver (e2e)', () => {
   });
 
   it('reward', async () => {
-    const reward = faker.helpers.arrayElement(REWARDS);
+    const reward = createRandomReward();
     reward.reason = faker.lorem.sentence();
+
+    await mockRewardsDb.insertAsync(reward);
 
     const test = request(app.getHttpServer())
       .post('/graphql')
@@ -112,8 +129,8 @@ describe('RewardsResolver (e2e)', () => {
         }`,
         variables: {
           data: {
-            giverId: faker.helpers.arrayElement(USERS).id,
-            receiverId: faker.helpers.arrayElement(USERS).id,
+            giverId: faker.datatype.uuid(),
+            receiverId: faker.datatype.uuid(),
             reason: 'reason',
           },
         },
@@ -146,8 +163,11 @@ describe('RewardsResolver (e2e)', () => {
       .expectClosed();
   });
 
-  it('rewards', () => {
-    const totalCount = REWARDS.length;
+  it('rewards', async () => {
+    const totalCount = 5;
+    await mockRewardsDb.insertAsync(
+      Array.from({ length: totalCount }, () => createRandomReward()),
+    );
 
     const test = request(app.getHttpServer())
       .post('/graphql')
@@ -182,7 +202,7 @@ describe('RewardsResolver (e2e)', () => {
     const reward = createRandomReward();
     const id = reward.id;
 
-    REWARDS.push(reward);
+    await mockRewardsDb.insertAsync(reward);
 
     const subscribeRewardRemovedRequest = subscribeRequest({
       query: `#graphql

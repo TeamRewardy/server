@@ -1,17 +1,22 @@
 import { faker } from '@faker-js/faker';
 import type { TestingModule } from '@nestjs/testing';
 import { Test } from '@nestjs/testing';
+import NeDB from '@seald-io/nedb';
 import { UUID_V4_REGEX } from 'src/common/utils/uuid.util';
-import { createRandomUser, USERS } from 'src/mocks/users';
+import { createRandomUser } from 'src/mocks/users';
 import { castUserId, User } from './models/user.model';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
 
+  let mockDb: NeDB<User>;
+
   beforeEach(async () => {
+    mockDb = new NeDB<User>();
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService],
+      providers: [UsersService, { provide: 'USERS_DB', useValue: mockDb }],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -44,7 +49,7 @@ describe('UsersService', () => {
   it('should find user by username', async () => {
     const mockedUser = createRandomUser();
 
-    USERS.push(mockedUser);
+    await mockDb.insertAsync(mockedUser);
 
     const user = await service.findOneByUsername(mockedUser.username);
 
@@ -52,11 +57,11 @@ describe('UsersService', () => {
   });
 
   it('should find users', async () => {
-    const totalCount = USERS.length;
+    const totalCount = 5;
 
-    // const mockedUsers = Array.from({ length: totalCount }, () =>
-    //   createRandomUser(),
-    // );
+    await mockDb.insertAsync(
+      Array.from({ length: totalCount }, () => createRandomUser()),
+    );
 
     const users = await service.findAll({ offset: 0, limit: 10 });
     expect(users).toHaveLength(totalCount);
@@ -71,8 +76,13 @@ describe('UsersService', () => {
   });
 
   it('should count users', async () => {
+    const totalCount = 5;
+    await mockDb.insertAsync(
+      Array.from({ length: totalCount }, () => createRandomUser()),
+    );
+
     const count = await service.count({});
-    expect(count).toEqual(USERS.length);
+    expect(count).toEqual(totalCount);
   });
 
   it('should update an existing user', async () => {
@@ -82,7 +92,7 @@ describe('UsersService', () => {
       username: 'User to update',
     });
 
-    USERS.push(user);
+    await mockDb.insertAsync(user);
 
     const token = 'new-token';
 
@@ -93,7 +103,7 @@ describe('UsersService', () => {
     expect(actual).toEqual({
       id,
       createdAt: user.createdAt,
-      lastModifiedAt: user.lastModifiedAt,
+      lastModifiedAt: expect.any(Date),
       username: user.username,
       token,
     });
