@@ -10,10 +10,11 @@ import { RewardsService } from './rewards.service';
     RewardsService,
     {
       provide: 'REWARDS_DB',
-      useValue: new NeDB<Reward>({
-        filename: 'db/rewards.json',
-        autoload: true,
-      }),
+      useValue: new NeDB<Reward>(
+        process.env.NODE_ENV === 'test'
+          ? { inMemoryOnly: true }
+          : { filename: 'db/rewards.json', autoload: true },
+      ),
     },
   ],
   exports: [RewardsService],

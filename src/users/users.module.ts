@@ -10,10 +10,11 @@ import { UsersService } from './users.service';
     UsersService,
     {
       provide: 'USERS_DB',
-      useValue: new NeDB<User>({
-        filename: 'db/users.json',
-        autoload: true,
-      }),
+      useValue: new NeDB<User>(
+        process.env.NODE_ENV === 'test'
+          ? { inMemoryOnly: true }
+          : { filename: 'db/users.json', autoload: true },
+      ),
     },
   ],
   exports: [UsersService],
