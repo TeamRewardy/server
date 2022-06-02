@@ -1,13 +1,16 @@
+import { DiscordModule } from '@discord-nestjs/core';
 import type { ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloDriver } from '@nestjs/apollo';
 import { forwardRef, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
+import { Intents } from 'discord.js';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { DiscordBotModule } from './discord-bot/discord-bot.module';
 import { PubSubModule } from './pub-sub.module';
 import {
   createRewardsLoader,
@@ -67,6 +70,18 @@ export const TRANSACTION_ID_KEY = 'transactionId';
       }),
       inject: [UsersService, RewardsService],
     }),
+    DiscordModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        token: configService.get('DISCORD_TOKEN') ?? '',
+        discordClientOptions: {
+          intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+        },
+        prefix: '!',
+      }),
+      inject: [ConfigService],
+    }),
+    DiscordBotModule,
   ],
   controllers: [AppController],
   providers: [AppService],
